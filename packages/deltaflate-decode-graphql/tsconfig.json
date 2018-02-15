@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "rootDirs": ["src", "test"],
+    "outDir": "lib",
+    "typeRoots": ["node_modules/@types"],
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": false,
+    "pretty": true,
+    "removeComments": true,
+    "lib": ["es2017", "dom"],
+    "types": ["@types/node"]
+  },
+  "exclude": ["node_modules", "lib"]
+}
