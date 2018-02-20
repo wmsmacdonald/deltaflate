@@ -13,36 +13,38 @@ function getIfNoneMatch(headers: Headers): Array<string> {
     : [];
 }
 
-export interface CacheMatch<Dictionary> {
+export interface CacheMatch<DictionaryType> {
   eTag: ETag;
-  dictionary: Dictionary;
+  dictionary: DictionaryType;
 }
 
 export type ETag = string;
 
-export interface EncoderDictionaryStore<Dictionary> {
+export interface EncoderDictionaryStore<DictionaryType> {
   has(eTag: ETag): Boolean;
-  get(eTag: ETag): Dictionary;
-  write(responseBody: Buffer, dictionaryETag?: ETag): void;
+  get(eTag: ETag): DictionaryType;
+  remove(eTag: ETag): void;
+  write(request: Request, response: Response, dictionary?: DictionaryType): void;
+  createETag(dictionary: DictionaryType): string;
 }
 
-export interface ImEncoder<Dictionary> {
+export interface ImEncoder<DictionaryType> {
   name: string;
-  encode(dictionary: Dictionary, body: Buffer): Buffer;
+  encode(dictionary: DictionaryType, body: Buffer): Buffer;
 }
 
-export async function deltaflateEncode<Dictionary>(
-  dictionaryStore: EncoderDictionaryStore<Dictionary>,
-  imEncoders: Array<ImEncoder<Dictionary>>,
+export async function deltaflateEncode<DictionaryType>(
+  dictionaryStore: EncoderDictionaryStore<DictionaryType>,
+  imEncoders: Array<ImEncoder<DictionaryType>>,
   request: Request,
   response: Response
 ) {
-  function decideIm(requestHeaders: Headers): ImEncoder<Dictionary> | undefined {
+  function decideIm(requestHeaders: Headers): ImEncoder<DictionaryType> | undefined {
     const clientRequestedIms = new Set(getAIms(requestHeaders));
     return imEncoders.find(({ name }) => clientRequestedIms.has(name));
   }
 
-  function getCacheMatch(request: Request): CacheMatch<Dictionary> | undefined {
+  function getCacheMatch(request: Request): CacheMatch<DictionaryType> | undefined {
     return first(
       getIfNoneMatch(request.headers)
         .filter(eTag => dictionaryStore.has(eTag))
@@ -52,27 +54,31 @@ export async function deltaflateEncode<Dictionary>(
 
   const imEncoder = decideIm(request.headers);
 
-  const clonedResponse = response.clone();
-  const responseBody = await clonedResponse.buffer();
+  const responseBody = await response.buffer();
 
   const cacheMatch = getCacheMatch(request);
 
   if (cacheMatch === undefined || imEncoder === undefined) {
-    dictionaryStore.write(responseBody);
+    dictionaryStore.write(response);
     return response;
   } else {
+    dictionaryStore.remove(cacheMatch.eTag);
+
+    dictionaryStore.write(response);
+
     const encodedBody = imEncoder.encode(cacheMatch.dictionary, responseBody);
 
     // TODO don't mutate input response
     response.headers.append("Delta-Base", cacheMatch.eTag);
     response.headers.append("im", imEncoder.name);
 
-    dictionaryStore.write(responseBody, cacheMatch.eTag);
-    return new Response(encodedBody, {
+    const deltaResponse = new Response(encodedBody, {
       status: 226,
       statusText: response.statusText,
       headers: response.headers
     });
+
+    return deltaResponse;
   }
 }
 export default deltaflateEncode;

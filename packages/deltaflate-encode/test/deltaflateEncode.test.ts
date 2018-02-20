@@ -24,6 +24,11 @@ describe('DeltaflateServer', () => {
       }
     },
     write() {
+    },
+    remove() {
+    },
+    createETag() {
+      return '';
     }
   }
   const imEncoder: ImEncoder<string> = {
