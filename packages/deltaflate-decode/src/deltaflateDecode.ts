@@ -5,11 +5,11 @@ function getIms(headers: Headers): Array<string> {
   return headers.has("im") ? headers.get("im").split(", ") : [];
 }
 
-export async function deltaflateDecode<Dictionary>(
-  decoderDictionaryStore: DecoderDictionaryStore<Dictionary>,
-  eTagsToDictionaries: Map<ETag, Dictionary>,
+export async function deltaflateDecode<DictionaryType>(
+  decoderDictionaryStore: DecoderDictionaryStore<DictionaryType>,
+  eTagsToDictionaries: Map<ETag, DictionaryType>,
   // must preserve order as in createDeltaRequest
-  imDecoders: Array<ImDecoder<Dictionary>>,
+  imDecoders: Array<ImDecoder<DictionaryType>>,
   response: Response
 ) {
   if (response.status === 226) {
@@ -27,8 +27,8 @@ export async function deltaflateDecode<Dictionary>(
       await response.arrayBuffer()
     );
 
-    const newResponseBody = decoderDictionaryStore.read(
-      decodedResponseBody,
+    const newResponseBody = decoderDictionaryStore.write(
+      response,
       matchingETag
     );
 

@@ -2,10 +2,9 @@ export type ETag = string;
 
 export type ETagsToDictionaries<Dictionary> = Map<ETag, Dictionary>
 
-export interface DecoderDictionaryStore<Dictionary> {
-  has(body: BufferSource): Boolean;
-  get(body: BufferSource): Array<[ETag, Dictionary]>;
-  read(decoded: BufferSource, dictionaryETag?: ETag): BufferSource;
+export interface DecoderDictionaryStore<TDictionary> {
+  read(request: Request): Promise<Array<TDictionary | void>>;
+  write(response: Response, dictionaryETag?: ETag) : void;
 }
 
 export interface ImDecoder<Dictionary> {

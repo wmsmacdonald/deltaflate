@@ -1,2 +1,2 @@
-export * from './deltaflateDecode';
-export * from './createDeltaRequest';
+export * from './createFetch';
+export * from './GraphQLDecoderDictionaryStore';

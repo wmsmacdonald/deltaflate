@@ -4,24 +4,24 @@ import {
   ETag,
   ImDecoder
 } from "./types";
+import zip from 'lodash/zip';
 
-export async function createDeltaRequest<Dictionary>(
-  decoderDictionaryStore: DecoderDictionaryStore<Dictionary>,
-  imDecoders: Array<ImDecoder<Dictionary>>,
+export async function createDeltaRequest<DictionaryType>(
+  decoderDictionaryStore: DecoderDictionaryStore<DictionaryType>,
+  imDecoders: Array<ImDecoder<DictionaryType>>,
+  eTagger: (DictionaryType) => string,
   request: Request
-): Promise<[Request, ETagsToDictionaries<Dictionary> | void]> {
-  const responseBody = await request.arrayBuffer();
+): Promise<[Request, ETagsToDictionaries<DictionaryType>]> {
 
-  const eTagsWithDictionaries = decoderDictionaryStore.get(responseBody);
-  if (eTagsWithDictionaries.length === 0) {
-    return [request, null];
-  } else {
-    const eTags = eTagsWithDictionaries.map(([eTag]) => eTag);
+  const dictionaries = await decoderDictionaryStore.read(request);
+
+  const eTags = dictionaries.map(eTagger);
+  if (dictionaries.length > 0) {
     // TODO don't mutate headers
     request.headers.append("If-None-Accept", eTags.join(", "));
 
     const ims = imDecoders.map(({ name }) => name);
     request.headers.append("a-im", ims.join(", "));
-    return [request, new Map(eTagsWithDictionaries)];
   }
+  return [request, new Map(zip(eTags, dictionaries))];
 }
