@@ -26,12 +26,16 @@ const client = new ApolloClient({
 ## Express GraphQL server
 ```javascript
 const { deltaflateExpress } = require('deltaflate-express');
+const { GraphQLEncoderDictionaryStore } = require('deltaflate-decode-graphql');
 
 const express = require('express');
 const { graphqlExpress } = require('apollo-server-express');
 const express = require('express');
+const { InMemoryCache } = require('apollo-cache-inmemory');
 
 const app = express();
 
-app.use('/graphql', deltaflateExpress(), graphqlExpress({ schema }));
+const dictionaryStore = new GraphQLEncoderDictionaryStore(() => new InMemoryCache());
+
+app.use('/graphql', deltaflateExpress(dictionaryStore), graphqlExpress({ schema }));
 ```
