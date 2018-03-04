@@ -1,7 +1,6 @@
 import {
   DecoderDictionaryStore,
   ETagsToDictionaries,
-  ETag,
   ImDecoder
 } from "./types";
 import zip from 'lodash/zip';

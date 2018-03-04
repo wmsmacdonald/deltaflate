@@ -1,6 +1,5 @@
 import { DecoderDictionaryStore } from '../../deltaflate-decode/src'
 import { ApolloCache } from 'apollo-cache';
-import { decode } from 'punycode';
 
 export class GraphQLDecoderDictionaryStore<TSerialized> implements DecoderDictionaryStore<TSerialized> {
   cache: ApolloCache<TSerialized>;
@@ -9,7 +8,7 @@ export class GraphQLDecoderDictionaryStore<TSerialized> implements DecoderDictio
     this.cache = cache;
   }
 
-  read(request: Request): Promise<Array<TSerialized>> {
+  read(): Promise<Array<TSerialized>> {
     return Promise.resolve([this.cache.extract()]);
   }
 

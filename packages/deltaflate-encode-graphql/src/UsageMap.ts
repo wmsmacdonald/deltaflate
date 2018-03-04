@@ -32,6 +32,7 @@ export class UsageMap<K, V> {
       if (entry.count === 0) {
         this.map.delete(key);
       }
+      return true;
     }
     else {
       return false;

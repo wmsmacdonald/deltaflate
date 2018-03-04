@@ -1,6 +1,7 @@
-
 import { first } from "lodash";
 import { Request, Response, Headers } from "node-fetch";
+import { ImEncoder } from "./types";
+import jsondiffpatchImEncoder from "./jsondiffpatchImEncoder";
 
 // TODO support imparams
 function getAIms(headers: Headers): Array<string> {
@@ -24,27 +25,30 @@ export interface EncoderDictionaryStore<DictionaryType> {
   has(eTag: ETag): Boolean;
   get(eTag: ETag): DictionaryType;
   remove(eTag: ETag): void;
-  write(request: Request, response: Response, dictionary?: DictionaryType): void;
+  write(
+    request: Request,
+    response: Response,
+    dictionary?: DictionaryType
+  ): void;
   createETag(dictionary: DictionaryType): string;
-}
-
-export interface ImEncoder<DictionaryType> {
-  name: string;
-  encode(dictionary: DictionaryType, body: Buffer): Buffer;
 }
 
 export async function deltaflateEncode<DictionaryType>(
   dictionaryStore: EncoderDictionaryStore<DictionaryType>,
-  imEncoders: Array<ImEncoder<DictionaryType>>,
+  imEncoders: Array<ImEncoder<DictionaryType>> = [jsondiffpatchImEncoder],
   request: Request,
   response: Response
 ) {
-  function decideIm(requestHeaders: Headers): ImEncoder<DictionaryType> | undefined {
+  function decideIm(
+    requestHeaders: Headers
+  ): ImEncoder<DictionaryType> | undefined {
     const clientRequestedIms = new Set(getAIms(requestHeaders));
     return imEncoders.find(({ name }) => clientRequestedIms.has(name));
   }
 
-  function getCacheMatch(request: Request): CacheMatch<DictionaryType> | undefined {
+  function getCacheMatch(
+    request: Request
+  ): CacheMatch<DictionaryType> | undefined {
     return first(
       getIfNoneMatch(request.headers)
         .filter(eTag => dictionaryStore.has(eTag))
@@ -59,12 +63,12 @@ export async function deltaflateEncode<DictionaryType>(
   const cacheMatch = getCacheMatch(request);
 
   if (cacheMatch === undefined || imEncoder === undefined) {
-    dictionaryStore.write(response);
+    dictionaryStore.write(request, response);
     return response;
   } else {
     dictionaryStore.remove(cacheMatch.eTag);
 
-    dictionaryStore.write(response);
+    dictionaryStore.write(request, response, cacheMatch.dictionary);
 
     const encodedBody = imEncoder.encode(cacheMatch.dictionary, responseBody);
 

@@ -13,7 +13,9 @@
     "pretty": true,
     "removeComments": true,
     "lib": ["es2017", "dom"],
-    "types": ["@types/node"]
+    "types": ["@types/node"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "exclude": ["node_modules", "lib"]
 }

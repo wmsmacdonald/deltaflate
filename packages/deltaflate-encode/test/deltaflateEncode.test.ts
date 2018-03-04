@@ -1,9 +1,9 @@
 import 'mocha';
 import { expect } from 'chai';
-import { stub } from 'sinon';
 import { Request, Response, Headers } from 'node-fetch';
 
-import { deltaflateEncode, EncoderDictionaryStore, ImEncoder } from '../src/deltaflateEncode';
+import { deltaflateEncode, EncoderDictionaryStore } from '../src/deltaflateEncode';
+import { ImEncoder } from '../src/types';
 
 describe('DeltaflateServer', () => {
   const encoderDictionaryStore: EncoderDictionaryStore<string> = {
@@ -33,7 +33,7 @@ describe('DeltaflateServer', () => {
   }
   const imEncoder: ImEncoder<string> = {
     name: 'someImEncoder',
-    encode(dictionary, body) {
+    encode(dictionary) {
       expect(dictionary).to.equal('hello');
 
       return new Buffer('encoded');

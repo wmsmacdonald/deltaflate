@@ -1,21 +1,22 @@
-import { ApolloCache } from 'apollo-cache';
-import { Response, Request } from 'node-fetch';
+import { ApolloCache } from "apollo-cache";
+import { Response, Request } from "node-fetch";
+import hash from "object-hash";
 
-import { UsageMap } from './UsageMap';
+import { UsageMap } from "./UsageMap";
 
-type ETag = string;
+export type ETag = string;
 
-interface CacheEntry<TSerialized> {
-  clientCount: number,
-  cache: ApolloCache<TSerialized>
-};
-
-class GraphQLEncoderDictionaryStore<TSerialized> {
-  private createCache: () => ApolloCache<TSerialized>; 
+export class GraphQLEncoderDictionaryStore<
+  TSerialized
+> {
+  private createCache: () => ApolloCache<TSerialized>;
   private eTagsToCaches: UsageMap<ETag, ApolloCache<TSerialized>>;
   createETag: (TSerialized) => string;
 
-  constructor(createCache: () => ApolloCache<TSerialized>, createETag: (TSerialized) => string) {
+  constructor(
+    createCache: () => ApolloCache<TSerialized>,
+    createETag: (TSerialized) => string = hash
+  ) {
     this.createCache = createCache;
     this.createETag = createETag;
     this.eTagsToCaches = new UsageMap<ETag, ApolloCache<TSerialized>>();
@@ -34,11 +35,20 @@ class GraphQLEncoderDictionaryStore<TSerialized> {
   }
 
   // add support for graphql in GET
-  async write(request: Request, response: Response, dictionary?: TSerialized): Promise<void> {
+  async write(
+    request: Request,
+    response: Response,
+    dictionary?: TSerialized
+  ): Promise<void> {
     if (dictionary) {
       const eTag = this.createETag(dictionary);
-      const cache = this.eTagsToCaches.has(eTag) ? this.createCache() : this.eTagsToCaches.get(eTag);
-      const [query, data] = await Promise.all([await request.json(), await response.json()]);
+      const cache = this.eTagsToCaches.has(eTag)
+        ? this.createCache()
+        : this.eTagsToCaches.get(eTag);
+      const [query, data] = await Promise.all([
+        await request.json(),
+        await response.json()
+      ]);
       cache.writeQuery({
         query,
         data

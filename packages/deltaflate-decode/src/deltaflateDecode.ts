@@ -27,7 +27,7 @@ export async function deltaflateDecode<DictionaryType>(
       await response.arrayBuffer()
     );
 
-    const newResponseBody = decoderDictionaryStore.write(
+    decoderDictionaryStore.write(
       response,
       matchingETag
     );
@@ -36,7 +36,7 @@ export async function deltaflateDecode<DictionaryType>(
     response.headers.delete("Delta-Base");
     response.headers.delete("IM");
 
-    return new Response(newResponseBody, {
+    return new Response(decodedResponseBody, {
       status: 200,
       statusText: "OK",
       headers: response.headers

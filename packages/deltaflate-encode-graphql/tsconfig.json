@@ -13,7 +13,9 @@
     "types": ["@types/node"],
     "rootDirs": ["./src", "./test"],
     "outDir": "lib",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "exclude": ["node_modules", "lib"]
 }
