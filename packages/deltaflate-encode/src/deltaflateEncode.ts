@@ -1,6 +1,6 @@
 import { first } from "lodash";
 import { Request, Response, Headers } from "node-fetch";
-import { ImEncoder } from "./types";
+import { ImEncoder, EncoderDictionaryStore, ETag } from "./types";
 import jsondiffpatchImEncoder from "./jsondiffpatchImEncoder";
 
 // TODO support imparams
@@ -17,20 +17,6 @@ function getIfNoneMatch(headers: Headers): Array<string> {
 export interface CacheMatch<DictionaryType> {
   eTag: ETag;
   dictionary: DictionaryType;
-}
-
-export type ETag = string;
-
-export interface EncoderDictionaryStore<DictionaryType> {
-  has(eTag: ETag): Boolean;
-  get(eTag: ETag): DictionaryType;
-  remove(eTag: ETag): void;
-  write(
-    request: Request,
-    response: Response,
-    dictionary?: DictionaryType
-  ): void;
-  createETag(dictionary: DictionaryType): string;
 }
 
 export async function deltaflateEncode<DictionaryType>(
@@ -66,7 +52,7 @@ export async function deltaflateEncode<DictionaryType>(
     dictionaryStore.write(request, response);
     return response;
   } else {
-    dictionaryStore.remove(cacheMatch.eTag);
+    dictionaryStore.delete(cacheMatch.eTag);
 
     dictionaryStore.write(request, response, cacheMatch.dictionary);
 

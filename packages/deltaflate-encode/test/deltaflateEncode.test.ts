@@ -2,7 +2,8 @@ import 'mocha';
 import { expect } from 'chai';
 import { Request, Response, Headers } from 'node-fetch';
 
-import { deltaflateEncode, EncoderDictionaryStore } from '../src/deltaflateEncode';
+import { deltaflateEncode, EncoderDictionaryStore } from '../src/index';
+
 import { ImEncoder } from '../src/types';
 
 describe('DeltaflateServer', () => {
@@ -25,7 +26,7 @@ describe('DeltaflateServer', () => {
     },
     write() {
     },
-    remove() {
+    delete() {
     },
     createETag() {
       return '';

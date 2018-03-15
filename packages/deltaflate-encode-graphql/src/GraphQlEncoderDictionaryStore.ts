@@ -1,16 +1,16 @@
 import { ApolloCache } from "apollo-cache";
 import { Response, Request } from "node-fetch";
-import hash from "object-hash";
+import * as hash from "object-hash";
 
-import { UsageMap } from "./UsageMap";
+import { CountedMap } from "./CountedMap";
 
 export type ETag = string;
 
-export class GraphQLEncoderDictionaryStore<
+export class GraphQlEncoderDictionaryStore<
   TSerialized
 > {
   private createCache: () => ApolloCache<TSerialized>;
-  private eTagsToCaches: UsageMap<ETag, ApolloCache<TSerialized>>;
+  private eTagsToCaches: CountedMap<ETag, ApolloCache<TSerialized>>;
   createETag: (TSerialized) => string;
 
   constructor(
@@ -19,7 +19,7 @@ export class GraphQLEncoderDictionaryStore<
   ) {
     this.createCache = createCache;
     this.createETag = createETag;
-    this.eTagsToCaches = new UsageMap<ETag, ApolloCache<TSerialized>>();
+    this.eTagsToCaches = new CountedMap<ETag, ApolloCache<TSerialized>>();
   }
 
   has(eTag: ETag): Boolean {
@@ -30,8 +30,8 @@ export class GraphQLEncoderDictionaryStore<
     return this.eTagsToCaches.get(eTag).extract();
   }
 
-  remove(eTag) {
-    this.eTagsToCaches.remove(eTag);
+  delete(eTag) {
+    this.eTagsToCaches.delete(eTag);
   }
 
   // add support for graphql in GET
@@ -43,17 +43,18 @@ export class GraphQLEncoderDictionaryStore<
     if (dictionary) {
       const eTag = this.createETag(dictionary);
       const cache = this.eTagsToCaches.has(eTag)
-        ? this.createCache()
-        : this.eTagsToCaches.get(eTag);
-      const [query, data] = await Promise.all([
+        ? this.eTagsToCaches.get(eTag)
+        : this.createCache();
+      const [query, result] = await Promise.all([
         await request.json(),
         await response.json()
       ]);
       cache.writeQuery({
         query,
-        data
+        data: result.data
       });
-      this.eTagsToCaches.add(eTag, cache);
+      this.eTagsToCaches.set(eTag, cache);
     }
   }
 }
+export default GraphQlEncoderDictionaryStore;

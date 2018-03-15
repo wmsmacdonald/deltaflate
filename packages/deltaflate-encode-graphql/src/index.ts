@@ -1,1 +1,1 @@
-export * from './GraphQLEncoderDictionaryStore';
+export * from './GraphQlEncoderDictionaryStore';
