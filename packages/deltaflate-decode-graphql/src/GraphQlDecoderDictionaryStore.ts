@@ -1,7 +1,7 @@
 import { DecoderDictionaryStore } from '../../deltaflate-decode/src'
 import { ApolloCache } from 'apollo-cache';
 
-export class GraphQLDecoderDictionaryStore<TSerialized> implements DecoderDictionaryStore<TSerialized> {
+export class GraphQlDecoderDictionaryStore<TSerialized> implements DecoderDictionaryStore<TSerialized> {
   cache: ApolloCache<TSerialized>;
 
   constructor(cache: ApolloCache<TSerialized>) {
@@ -18,3 +18,4 @@ export class GraphQLDecoderDictionaryStore<TSerialized> implements DecoderDictio
     this.cache.restore(decodedBody);
   }
 }
+export default GraphQlDecoderDictionaryStore;

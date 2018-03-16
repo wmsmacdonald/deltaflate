@@ -1,3 +1,3 @@
 export * from './createFetch';
-export * from './GraphQLDecoderDictionaryStore';
+export * from './GraphQlDecoderDictionaryStore';
 export * from './types';

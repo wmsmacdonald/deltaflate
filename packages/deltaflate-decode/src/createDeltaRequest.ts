@@ -3,15 +3,19 @@ import {
   ETagsToDictionaries,
   ImDecoder
 } from "./types";
-import zip from 'lodash/zip';
+import { zip } from "lodash";
+
+export interface DeltaRequest<DictionaryType> {
+  request: Request;
+  eTagsToDictionaries: ETagsToDictionaries<DictionaryType>;
+}
 
 export async function createDeltaRequest<DictionaryType>(
   decoderDictionaryStore: DecoderDictionaryStore<DictionaryType>,
   imDecoders: Array<ImDecoder<DictionaryType>>,
   eTagger: (DictionaryType) => string,
   request: Request
-): Promise<[Request, ETagsToDictionaries<DictionaryType>]> {
-
+): Promise<DeltaRequest<DictionaryType>> {
   const dictionaries = await decoderDictionaryStore.read(request);
 
   const eTags = dictionaries.map(eTagger);
@@ -22,5 +26,13 @@ export async function createDeltaRequest<DictionaryType>(
     const ims = imDecoders.map(({ name }) => name);
     request.headers.append("a-im", ims.join(", "));
   }
-  return [request, new Map(zip(eTags, dictionaries))];
+
+  const eTagsToDictionaries: ETagsToDictionaries<DictionaryType> = new Map(
+    zip(eTags, dictionaries)
+  );
+
+  return {
+    request,
+    eTagsToDictionaries
+  };
 }

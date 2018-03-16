@@ -1,5 +1,6 @@
+import { Request, Response } from 'whatwg-fetch';
 import { ApolloCache } from "apollo-cache";
-import { GraphQLDecoderDictionaryStore } from "./GraphQLDecoderDictionaryStore";
+import { GraphQlDecoderDictionaryStore } from "./GraphQlDecoderDictionaryStore";
 
 import {
   createDeltaRequest,
@@ -13,11 +14,12 @@ export function createFetch<TSerialized>(
   eTagger: (TSerialized) => string,
   fetch: GlobalFetch["fetch"]
 ): GlobalFetch["fetch"] {
-  const dictionaryStore = new GraphQLDecoderDictionaryStore<TSerialized>(cache);
+  const dictionaryStore = new GraphQlDecoderDictionaryStore<TSerialized>(cache);
   return async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     const request = new Request(input, init);
+    console.log(await request.text());
 
-    const [deltaRequest, eTagsToDictionaries] = await createDeltaRequest(
+    const { request: deltaRequest, eTagsToDictionaries } = await createDeltaRequest(
       dictionaryStore,
       imDecoders,
       eTagger,
@@ -34,7 +36,9 @@ export function createFetch<TSerialized>(
     );
 
     dictionaryStore.write(decodedResponse);
-    const query = await request.json();
+    const query = await request.text();
+    console.log(query)
+    console.log('asdfasdf')
 
     const responseBody = cache.readQuery(query);
 
