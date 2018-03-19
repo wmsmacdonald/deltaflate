@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { Request } from "node-fetch";
 
 describe("createDeltaRequest", () => {
-  it("test", async () => {
+  it("should create delta request with proper headers ", async () => {
     class MockDecoderDictionaryStore implements DecoderDictionaryStore<string> {
       async read(request) {
         expect(await request.text()).to.equal("someBody");
@@ -13,7 +13,10 @@ describe("createDeltaRequest", () => {
       write() {}
     }
 
-    const mockETagger = () => "someEtag";
+    const mockETagger = dictionary => {
+      expect(dictionary).to.equal("someDictionary");
+      return "someEtag";
+    }
 
     const dictionaryStore = new MockDecoderDictionaryStore();
 
@@ -32,7 +35,8 @@ describe("createDeltaRequest", () => {
       request
     );
 
-    expect(request.headers.get('a-im')).to.equal('jsondiffpatch');
+    expect(deltaRequest.headers.get('a-im')).to.equal('jsondiffpatch');
+    expect(deltaRequest.headers.get('if-none-accept')).to.equal('someEtag');
     expect(eTagsToDictionaries.get('someEtag')).to.equal('someDictionary');
   });
 });

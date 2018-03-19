@@ -1,3 +1,4 @@
+import 'isomorphic-fetch';
 import { ETag, DecoderDictionaryStore, ImDecoder } from "./types";
 
 // TODO support imparams

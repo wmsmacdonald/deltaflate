@@ -7,7 +7,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "mocha --require ts-node/register test/**/*.test.ts"
+    "test": "tsc && mocha --require ts-node/register test/**/*.test.ts"
   },
   "repository": {
     "type": "git",
@@ -26,18 +26,16 @@
   },
   "homepage": "https://github.com/wmsmacdonald/deltaflate#readme",
   "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
     "jsondiffpatch": "^0.3.5",
     "lodash": "^4.17.5"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.2",
     "@types/mocha": "^2.2.48",
-    "@types/node": "^9.4.6",
-    "@types/sinon": "^4.1.3",
+    "@types/node": "^9.4.7",
     "chai": "^4.1.2",
     "mocha": "^5.0.1",
     "node-fetch": "^2.1.1",
-    "sinon": "^4.3.0",
     "ts-node": "^4.1.0",
     "typescript": "^2.7.1"
   }
