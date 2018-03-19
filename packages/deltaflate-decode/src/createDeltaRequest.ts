@@ -3,7 +3,7 @@ import {
   ETagsToDictionaries,
   ImDecoder
 } from "./types";
-import { zip } from "lodash";
+import * as zip from "lodash/zip";
 
 export interface DeltaRequest<DictionaryType> {
   request: Request;
