@@ -1,4 +1,6 @@
-import { Request, Response, Headers } from 'node-fetch';
+import 'mocha';
+import 'isomorphic-fetch';
+import fetch, { Request, Response, Headers } from 'node-fetch';
 import jsondiffpatchImDecoder from '../../deltaflate-decode/src/jsondiffpatchImDecoder';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from 'graphql-tag';
@@ -6,6 +8,10 @@ import { DiffPatcher } from 'jsondiffpatch';
 import * as hash from 'object-hash';
 
 import { createFetch } from '../src';
+
+global["Request"] = Request;
+global["Response"] = Response;
+global["fetch"] = fetch;
 
 const diffPatcher = new DiffPatcher();
 
@@ -29,10 +35,14 @@ describe('createFetch', () => {
 
     const delta = diffPatcher.diff(clientCache.extract(), serverCache.extract());
 
+    const r = new Response('');
+    console.log(Response)
+    r.arrayBuffer();
+
     const stubFetch = () => Promise.resolve(new Response(
       JSON.stringify(delta),
       {
-        status: 223,
+        status: 226,
         statusText: 'OK',
         headers: new Headers({
           'IM': 'jsondiffpatch'

@@ -3,6 +3,7 @@ import { Response, Headers } from 'node-fetch';
 import { deltaflateDecode, ETag, DecoderDictionaryStore } from '../src';
 import { expect } from 'chai';
 import { jsondiffpatchImDecoder } from '../src/jsondiffpatchImDecoder';
+import * as stringToArrayBuffer from 'string-to-arraybuffer';
 
 describe('deltaflateDecode', () => {
   describe('response is not delta encoded', async () => {
@@ -58,7 +59,7 @@ describe('deltaflateDecode', () => {
         decode(dictionary, body) {
           expect(dictionary).to.equal('someDictionary');
           expect(new Buffer(body).toString()).to.equal('someDelta');
-          return Buffer.from('decodedBody');
+          return stringToArrayBuffer('decodedBody');
         }
       }];
 

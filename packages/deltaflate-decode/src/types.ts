@@ -9,5 +9,5 @@ export interface DecoderDictionaryStore<TDictionary> {
 
 export interface ImDecoder<Dictionary> {
   name: string;
-  decode(dictionary: Dictionary, body: BufferSource): BufferSource;
+  decode(dictionary: Dictionary, body: ArrayBuffer): ArrayBuffer;
 }
