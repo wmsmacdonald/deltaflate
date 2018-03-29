@@ -1,9 +1,12 @@
 import 'mocha';
-import { Response, Headers } from 'node-fetch';
+import { Response, Headers, Request } from 'node-fetch';
 import { deltaflateDecode, ETag, DecoderDictionaryStore } from '../src';
 import { expect } from 'chai';
 import { jsondiffpatchImDecoder } from '../src/jsondiffpatchImDecoder';
-import * as stringToArrayBuffer from 'string-to-arraybuffer';
+import { TextEncoder } from 'text-encoding';
+
+global["Request"] = Request;
+global["Response"] = Response;
 
 describe('deltaflateDecode', () => {
   describe('response is not delta encoded', async () => {
@@ -59,7 +62,8 @@ describe('deltaflateDecode', () => {
         decode(dictionary, body) {
           expect(dictionary).to.equal('someDictionary');
           expect(new Buffer(body).toString()).to.equal('someDelta');
-          return stringToArrayBuffer('decodedBody');
+
+          return new TextEncoder().encode('decodedBody').buffer;
         }
       }];
 

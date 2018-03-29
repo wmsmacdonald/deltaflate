@@ -1,4 +1,3 @@
-import 'isomorphic-fetch';
 import { ETag, DecoderDictionaryStore, ImDecoder } from "./types";
 
 // TODO support imparams
@@ -23,14 +22,14 @@ export async function deltaflateDecode<DictionaryType>(
     const ims = new Set(getIms(response.headers));
     const decoders = imDecoders.filter(({ name }) => ims.has(name));
 
-    const decodedResponseBody = decoders.reduce(
-      (body, { decode }) => decode(matchingDictionary, body),
-      await response.arrayBuffer()
+    decoderDictionaryStore.write(
+      response.clone(),
+      matchingETag
     );
 
-    decoderDictionaryStore.write(
-      response,
-      matchingETag
+    const decodedResponseBody = decoders.reduce(
+      (body, { decode }) => decode(matchingDictionary, body),
+      await response.clone().arrayBuffer()
     );
 
     // TODO don't mutate headers

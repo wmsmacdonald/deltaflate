@@ -1,6 +1,5 @@
 import { DiffPatcher } from 'jsondiffpatch';
 import { TextDecoder, TextEncoder } from 'text-encoding';
-//import * as stringToArrayBuffer from 'string-to-arraybuffer';
 import 'text-encoding';
 import { ImDecoder } from './types';
 
@@ -13,7 +12,7 @@ export const jsondiffpatchImDecoder: ImDecoder<Seriazable> = {
   decode(dictionary: Seriazable, body: BufferSource): ArrayBuffer {
     const delta = JSON.parse(new TextDecoder().decode(body));
     const target = diffPatcher.patch(dictionary, delta);
-    return new TextEncoder().encode(JSON.stringify(target));
+    return new TextEncoder().encode(JSON.stringify(target)).buffer;
   }
 }
 export default jsondiffpatchImDecoder;

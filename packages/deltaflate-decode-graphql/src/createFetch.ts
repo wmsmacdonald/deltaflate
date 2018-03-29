@@ -31,11 +31,11 @@ export function createFetch<TSerialized>(
       dictionaryStore,
       eTagsToDictionaries,
       imDecoders,
-      response
+      response.clone()
     );
 
-    await dictionaryStore.write(decodedResponse.clone());
     const query = await request.json();
+    await dictionaryStore.write(decodedResponse);
 
     const responseBody = cache.readQuery({
       query

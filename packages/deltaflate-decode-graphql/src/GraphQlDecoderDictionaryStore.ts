@@ -14,7 +14,7 @@ export class GraphQlDecoderDictionaryStore<TSerialized> implements DecoderDictio
 
   // add GET query support
   async write(decodedResponse: Response): Promise<void> {
-    const decodedBody = await decodedResponse.json();
+    const decodedBody = await decodedResponse.clone().json();
     this.cache.restore(decodedBody);
   }
 }

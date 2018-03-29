@@ -1,11 +1,12 @@
 import 'mocha';
-import 'isomorphic-fetch';
 import fetch, { Request, Response, Headers } from 'node-fetch';
-import jsondiffpatchImDecoder from '../../deltaflate-decode/src/jsondiffpatchImDecoder';
+import { expect } from 'chai';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from 'graphql-tag';
 import { DiffPatcher } from 'jsondiffpatch';
 import * as hash from 'object-hash';
+
+import jsondiffpatchImDecoder from '../../deltaflate-decode/src/jsondiffpatchImDecoder';
 
 import { createFetch } from '../src';
 
@@ -16,30 +17,25 @@ global["fetch"] = fetch;
 const diffPatcher = new DiffPatcher();
 
 describe('createFetch', () => {
-  it('sadfas', async () => {
-
-    const clientCache = new InMemoryCache();
-    const serverCache = new InMemoryCache();
-
-    const query = gql`
-      {
-        movies
-      }
-    `;
-
-    const data = {
-      movies: ['Finding Nemo', 'Goodfellas']
+  let stubFetch;
+  let clientCache;
+  const query = gql`
+    {
+      movies
     }
+  `;
+  const data = {
+    movies: ['Finding Nemo', 'Goodfellas']
+  }
+  beforeEach(() => {
+    clientCache = new InMemoryCache();
+    const serverCache = new InMemoryCache();
 
     serverCache.writeQuery({ query, data });
 
     const delta = diffPatcher.diff(clientCache.extract(), serverCache.extract());
 
-    const r = new Response('');
-    console.log(Response)
-    r.arrayBuffer();
-
-    const stubFetch = () => Promise.resolve(new Response(
+    stubFetch = () => Promise.resolve(new Response(
       JSON.stringify(delta),
       {
         status: 226,
@@ -49,12 +45,16 @@ describe('createFetch', () => {
         })
       }
     ));
-
+  });
+  it('resolves correct data', async () => {
     const fetcher = createFetch(clientCache, [jsondiffpatchImDecoder], hash, stubFetch);
 
     const response = await fetcher(new Request('', {
       method: 'POST',
       body: JSON.stringify(query)
     }));
+
+    const responseBody = await response.json();
+    expect(responseBody).to.deep.equal(data);
   });
 });
