@@ -28,7 +28,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.106",
     "@types/node-fetch": "^1.6.7",
-    "graphql": "^0.13.2",
+    "intercept-response": "^0.1.4",
     "jsondiffpatch": "^0.3.8",
     "lodash": "^4.17.5"
   },
@@ -36,12 +36,11 @@
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
     "@types/sinon": "^4.3.0",
-    "apollo-cache-inmemory": "^1.1.12",
-    "apollo-server-express": "^1.3.4",
     "chai": "^4.1.2",
     "express": "^4.16.3",
     "mocha": "^5.0.5",
     "node-fetch": "^2.1.2",
+    "sinon": "^4.4.9",
     "ts-node": "^5.0.1",
     "typescript": "^2.8.1"
   }

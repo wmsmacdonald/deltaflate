@@ -44,7 +44,7 @@ export async function deltaflateEncode<DictionaryType>(
 
   const imEncoder = decideIm(request.headers);
 
-  const responseBody = await response.buffer();
+  const responseBody = await response.clone().buffer();
 
   const cacheMatch = getCacheMatch(request);
 
