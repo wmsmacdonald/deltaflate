@@ -3,12 +3,14 @@ import { Response, Request } from "node-fetch";
 import * as hash from "object-hash";
 
 import { CountedMap } from "./CountedMap";
+import { EncoderDictionaryStore } from 'deltaflate-encode';
 
 export type ETag = string;
 
 export class GraphQlEncoderDictionaryStore<
   TSerialized
-> {
+> implements EncoderDictionaryStore<TSerialized> {
+
   private createCache: () => ApolloCache<TSerialized>;
   private eTagsToCaches: CountedMap<ETag, ApolloCache<TSerialized>>;
   createETag: (TSerialized) => string;
@@ -40,15 +42,18 @@ export class GraphQlEncoderDictionaryStore<
     response: Response,
     dictionary?: TSerialized
   ): Promise<void> {
+
     if (dictionary) {
       const eTag = this.createETag(dictionary);
       const cache = this.eTagsToCaches.has(eTag)
         ? this.eTagsToCaches.get(eTag)
         : this.createCache();
+
       const [query, result] = await Promise.all([
         await request.json(),
         await response.json()
       ]);
+
       cache.writeQuery({
         query,
         data: result.data

@@ -1,9 +1,8 @@
+import 'mocha';
 import { InMemoryCache } from "apollo-cache-inmemory";
-import fetch, { Request, Response } from 'node-fetch';
+import { Request, Response } from 'node-fetch';
 import { GraphQlEncoderDictionaryStore } from "../src/index";
 import gql from 'graphql-tag';
-import { HttpLink } from 'apollo-link-http';
-import ApolloClient from 'apollo-client'; 
 import * as hash from 'object-hash';
 import { expect } from 'chai';
 
@@ -25,11 +24,6 @@ describe("GraphQLEncoderDictionaryStore", () => {
     })
 
     const cache = new InMemoryCache();
-
-    const client = new ApolloClient({
-      link: new HttpLink({ fetch }),
-      cache
-    });
 
     const result = {
         movies: ['Finding Nemo', 'Goodfellas']

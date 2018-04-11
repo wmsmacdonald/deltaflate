@@ -1,6 +1,6 @@
+import 'mocha';
 import CountedMap from '../src/CountedMap';
 import { expect } from 'chai';
-
 
 
 describe('CountedMap', () => {

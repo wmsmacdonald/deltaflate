@@ -26,8 +26,6 @@
   },
   "homepage": "https://github.com/wmsmacdonald/deltaflate#readme",
   "dependencies": {
-    "@types/lodash": "^4.14.106",
-    "@types/node-fetch": "^1.6.7",
     "apollo-cache-inmemory": "^1.1.12",
     "node-fetch": "^2.1.2",
     "object-hash": "^1.3.0"
@@ -35,10 +33,11 @@
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
-    "@types/sinon": "^4.3.0",
-    "apollo-client": "^2.2.8",
-    "apollo-link-http": "^1.5.3",
+    "@types/node": "^9.6.4",
+    "@types/sinon": "^4.3.1",
+    "apollo-cache": "^1.1.7",
     "chai": "^4.1.2",
+    "deltaflate-encode": "^0.1.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
     "mocha": "^5.0.5",
