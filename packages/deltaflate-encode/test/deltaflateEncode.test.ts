@@ -6,57 +6,99 @@ import { deltaflateEncode, EncoderDictionaryStore } from '../src/index';
 
 import { ImEncoder } from '../src/types';
 
-describe('DeltaflateServer', () => {
-  const encoderDictionaryStore: EncoderDictionaryStore<string> = {
-    has(eTag) {
-      if (eTag !== 'someETag') {
-        throw new Error('incorrect ETag');
-      }
-      else {
-        return true;
-      }
-    },
-    get(eTag) {
-      if (eTag !== 'someETag') {
-        throw new Error('incorrect ETag');
-      }
-      else {
-        return 'hello';
-      }
-    },
-    write() {
-    },
-    delete() {
-    },
-    createETag() {
-      return '';
-    }
-  }
-  const imEncoder: ImEncoder<string> = {
-    name: 'someImEncoder',
-    encode(dictionary) {
-      expect(dictionary).to.equal('hello');
 
-      return new Buffer('encoded');
-    }
-  }
+function assertSameHeaders(headers1: Headers, headers2: Headers) {
+  headers1.forEach
+  expect(Array.from((headers1 as Headers .entries()))
 
-  it('test', async () => {
-    const request = new Request('http://example.com', {
-      method: 'post',
-      body: new Buffer('hello1'),
-      headers: {
-        'A-IM': 'someImEncoder',
-        'If-None-Match': 'someETag'
+}
+
+async function assertSameResponses(response1, response2) {
+  const [responseBody1, responseBody2] = await Promise.all([response1.clone().text(), response2.clone().text()]);
+  expect(responseBody1).to.equal(responseBody2);
+  expect(response1.status).to.equal(response2.status);
+  expect(response1.statusText).to.equal(response2.statusText);
+}
+
+describe('deltaflateEncode', () => {
+  const request = new Request('http://example.com', {
+    method: 'post',
+    body: Buffer.from('request body'),
+    headers: {
+      'A-IM': 'someImEncoder',
+      'If-None-Match': 'someETag'
+    }
+  });
+  const response = new Response('response body', {
+    status: 200,
+    statusText: 'OK'
+  });
+  const testDeltaflateEncode = (dictionaryStore, imEncoder, response)
+  describe('has dictionary match', () => {
+    const encoderDictionaryStore: EncoderDictionaryStore<string> = {
+      has: () => true,
+      get: () => 'someDictionary',
+      write: () => {},
+      delete: () => {},
+      createETag: () => ''
+    }
+    describe('has encoder match', () => {
+      const imEncoder: ImEncoder<string> = {
+        name: 'someImEncoder',
+        encode: () => Buffer.from('encoded')
       }
+
+      it('should resolve delta encoded response', async () => {
+        const changedResponse = await deltaflateEncode(encoderDictionaryStore, [imEncoder], request, response);
+        const responseBody = await changedResponse.text();
+        expect(responseBody).to.equal('encoded');
+        expect(changedResponse.status).to.equal(226);
+        expect(changedResponse.statusText).to.equal('OK');
+      });
     });
-    const response = new Response(new Buffer('hello2'), {
-      status: 200,
-      statusText: 'OK',
-      headers: new Headers()
+    describe('has no encoder match', () => {
+      const imEncoder: ImEncoder<string> = {
+        name: 'differentImEncoder',
+        encode: () => Buffer.from('encoded')
+      }
+
+      it('should resolve unchanged response', async () => {
+        const changedResponse = await deltaflateEncode(encoderDictionaryStore, [imEncoder], request, response);
+        const responseBody = await changedResponse.text();
+        expect(responseBody).to.equal('response body');
+      });
     });
-    const changedResponse = await deltaflateEncode(encoderDictionaryStore, [imEncoder], request, response);
-    const body = (await changedResponse.buffer()).toString();
-    expect(body).to.equal('encoded');
+  });
+  describe('has no dictionary match', () => {
+    const encoderDictionaryStore: EncoderDictionaryStore<string> = {
+      has: () => false,
+      get: () => '',
+      write: () => {},
+      delete: () => {},
+      createETag: () => ''
+    }
+
+    describe('has encoder match', () => {
+      const imEncoder: ImEncoder<string> = {
+        name: 'someImEncoder',
+        encode: () => Buffer.from('encoded')
+      }
+
+      it('should resolve unchanged response', async () => {
+        const unChangedResponse = await deltaflateEncode(encoderDictionaryStore, [imEncoder], request, response);
+      });
+    });
+    describe('has no encoder match', () => {
+      const imEncoder: ImEncoder<string> = {
+        name: 'differentImEncoder',
+        encode: () => Buffer.from('encoded')
+      }
+
+      it('should resolve unchanged response', async () => {
+        const changedResponse = await deltaflateEncode(encoderDictionaryStore, [imEncoder], request, response);
+        const responseBody = await changedResponse.text();
+        expect(responseBody).to.equal('response body');
+      });
+    });
   });
 });
