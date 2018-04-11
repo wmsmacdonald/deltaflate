@@ -1,10 +1,11 @@
 {
   "name": "deltaflate-server",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Core server support for delta compression over HTTP",
-  "main": "lib/index.js",
+  "main": "./lib/src/index.js",
+  "types": "./lib/src/main.d.ts",
   "directories": {
-    "lib": "lib"
+    "lib": "lib/src"
   },
   "scripts": {
     "test": "tsc && mocha --require ts-node/register test/**/*.test.ts"

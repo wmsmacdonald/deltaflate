@@ -2,7 +2,6 @@ import 'mocha';
 import { deltaflateExpress } from '../src/';
 import { EncoderDictionaryStore, ImEncoder } from '../../deltaflate-encode/src';
 import { expect } from 'chai';
-import * as sinon from 'sinon';
 import * as express from 'express';
 import fetch, { Headers }from 'node-fetch';
 
@@ -30,7 +29,7 @@ describe("deltaflateExpress", () => {
       app.use(
         "/",
         deltaflateExpress(dictionaryStore, [mockImEncoder]),
-        (request, response) => {
+        ({}, response) => {
           response.writeHead(200);
           response.end('response body');
         }
