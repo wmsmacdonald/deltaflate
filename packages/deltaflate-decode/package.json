@@ -1,7 +1,7 @@
 {
-  "name": "deltaflate-server",
+  "name": "deltaflate-decode",
   "version": "0.1.2",
-  "description": "Core server support for delta compression over HTTP",
+  "description": "Core client support for delta compression over HTTP",
   "main": "./lib/src/index.js",
   "types": "./lib/src/main.d.ts",
   "directories": {
@@ -17,8 +17,7 @@
   "keywords": [
     "delta",
     "compression",
-    "encoding",
-    "encode"
+    "decoding"
   ],
   "author": "William MacDonald",
   "license": "MIT",
