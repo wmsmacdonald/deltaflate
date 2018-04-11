@@ -2,7 +2,8 @@
   "name": "deltaflate-express",
   "version": "0.1.0",
   "description": "Express middleware for delta compression over HTTP",
-  "main": "lib/index.js",
+  "main": "lib/deltaflate-express/src/index.js",
+  "types": "lib/deltaflate-express/src/index.d.ts",
   "directories": {
     "lib": "lib"
   },
